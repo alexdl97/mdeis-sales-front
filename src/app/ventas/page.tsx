@@ -45,6 +45,7 @@ export default function ListarVentas() {
           <TableHead>
             <TableRow>
               <TableCell align="center" style={{ fontWeight: 'bold' }}>Nro</TableCell>
+              <TableCell align="center" style={{ fontWeight: 'bold' }}>Nit/Ci</TableCell>
               <TableCell align="center" style={{ fontWeight: 'bold' }}>Cliente</TableCell>
               <TableCell align="center" style={{ fontWeight: 'bold' }}>Condicion de Pago</TableCell>
               <TableCell align="center" style={{ fontWeight: 'bold' }}>Almacen</TableCell>
@@ -59,6 +60,9 @@ export default function ListarVentas() {
               >
                 <TableCell align="center">
                   {i + 1}
+                </TableCell>
+                <TableCell align="center">
+                  {row.taxId}
                 </TableCell>
                 <TableCell align="center">
                   {row.customer?.name}

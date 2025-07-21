@@ -14,11 +14,14 @@ import {
   Alert,
   Box,
   Button,
+  CircularProgress,
   Divider,
   FormControl,
+  Grid,
   InputLabel,
   MenuItem,
   Select,
+  TextField,
 } from "@mui/material";
 import { getProducts } from "../../services/productService";
 import { getCustomers } from "../../services/customerService";
@@ -35,6 +38,7 @@ export default function VentasPage() {
   const [paymentConditions, setPaymentConditions] = useState<
     PaymentCondition[]
   >([]);
+  const [taxId, setTaxId] = useState<string>('');
 
   const [productSelected, setProductSelected] = useState<Product | null>(null);
   const [warehouseSelected, setWarehouseSelected] = useState<Warehouse | null>(
@@ -150,15 +154,23 @@ export default function VentasPage() {
   const saveSale = async () => {
     setMessageError("");
     if (!customerSelected) {
-      setMessageError("Debe seleccionar un cliente");
+      setMessageError('Debe seleccionar un cliente');
       return;
     }
     if (!warehouseSelected) {
-      setMessageError("Debe seleccionar un almacen");
+      setMessageError('Debe seleccionar un almacen');
       return;
     }
     if (!paymentConditionSelected) {
-      setMessageError("Debe seleccionar una condicion de pago");
+      setMessageError('Debe seleccionar una condicion de pago');
+      return;
+    }
+    if(!taxId) {
+      setMessageError('Debe ingresar el NIT/CI');
+      return;
+    }
+    if (!items.length) {
+      setMessageError('Se debe agregar 1 producto mínimo');
       return;
     }
 
@@ -166,7 +178,7 @@ export default function VentasPage() {
       customerId: customerSelected.id,
       warehouseId: warehouseSelected.id,
       paymentConditionId: paymentConditionSelected.id,
-      taxId: new Date().getMilliseconds().toString(),
+      taxId: taxId,
       taxName: customerSelected.name,
       saleInvoiceItems: items.map((it) => ({
         productId: it.productId,
@@ -184,6 +196,10 @@ export default function VentasPage() {
     (acc, item) => acc + item.totalPrice,
     0
   );
+
+  if (isLoading) return (
+    <CircularProgress />
+  )
 
   return (
     <Box
@@ -203,8 +219,8 @@ export default function VentasPage() {
           Registrar Venta
         </h1>
         {messageError && <Alert severity="error">{messageError}</Alert>}
-        <Box mt={8} display="flex" justifyContent="space-evenly">
-          <Box sx={{ minWidth: 200 }}>
+        <Grid mt={2} container spacing={2}>
+          <Grid size={{ xs: 6, md: 4 }}>
             <FormControl fullWidth>
               <InputLabel variant="standard" htmlFor="uncontrolled-native">
                 Clientes
@@ -229,8 +245,19 @@ export default function VentasPage() {
                 ))}
               </Select>
             </FormControl>
-          </Box>
-          <Box sx={{ minWidth: 200 }}>
+          </Grid>
+          <Grid size={{ xs: 6, md: 4 }}>
+            <FormControl fullWidth>
+              <TextField
+                id="outlined-basic"
+                value={taxId}
+                label="NIT/CI"
+                variant="outlined"
+                onChange={(e) => setTaxId(e.target.value)}
+              />
+            </FormControl>
+          </Grid>
+          <Grid size={{ xs: 6, md: 4 }}>
             <FormControl fullWidth>
               <InputLabel variant="standard" htmlFor="uncontrolled-native">
                 Almacenes
@@ -255,8 +282,8 @@ export default function VentasPage() {
                 ))}
               </Select>
             </FormControl>
-          </Box>
-          <Box sx={{ minWidth: 200 }}>
+          </Grid>
+          <Grid size={{ xs: 6, md: 4 }}>
             <FormControl fullWidth>
               <InputLabel variant="standard" htmlFor="uncontrolled-native">
                 Condicion de Pago
@@ -282,10 +309,8 @@ export default function VentasPage() {
                 ))}
               </Select>
             </FormControl>
-          </Box>
-        </Box>
-        <Box mt={2} display="flex" justifyContent="space-evenly">
-          <Box sx={{ minWidth: 200 }}>
+          </Grid>
+          <Grid size={{ xs: 6, md: 4 }}>
             <FormControl fullWidth>
               <InputLabel variant="standard" htmlFor="uncontrolled-native">
                 Productos
@@ -310,8 +335,8 @@ export default function VentasPage() {
                 ))}
               </Select>
             </FormControl>
-          </Box>
-          <Box display="flex" justifyContent="center" alignItems="center">
+          </Grid>
+          <Grid display="flex" justifyContent="center" alignItems="center">
             <Button
               variant="contained"
               onClick={() => {
@@ -320,8 +345,8 @@ export default function VentasPage() {
             >
               Agregar Producto
             </Button>
-          </Box>
-        </Box>
+          </Grid>
+        </Grid>
         <Box my={2} height="40vh" overflow="auto">
           <h3>Detalle de la venta</h3>
           <ItemsTable
@@ -338,9 +363,17 @@ export default function VentasPage() {
         <Box
           mt={4}
           display="flex"
-          justifyContent="flex-end"
+          justifyContent="space-between"
           alignItems="center"
         >
+          <Button
+            variant="contained"
+            onClick={() => {
+              router.replace('/ventas');
+            }}
+          >
+            Volver al Listado
+          </Button>
           <Button
             variant="contained"
             onClick={() => {
