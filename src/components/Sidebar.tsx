@@ -22,8 +22,8 @@ const drawerWidth = 240;
 const menuItems = [
   { name: "Dashboard", path: "/", icon: <DashboardIcon /> },
   { name: "Ventas", path: "/ventas", icon: <PointOfSaleIcon /> },
-  { name: "Productos", path: "/productos", icon: <InventoryIcon /> },
-  { name: "Clientes", path: "/clientes", icon: <PeopleIcon /> },
+  { name: "Productos", path: "/products", icon: <InventoryIcon /> },
+  { name: "Clientes", path: "/customers", icon: <PeopleIcon /> },
 ];
 
 export default function Sidebar() {
