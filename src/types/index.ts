@@ -11,6 +11,8 @@ export interface Customer {
   id: string;
   name: string;
   code: string;
+  dni: string;
+  email: string;
   customerGroupId?: string;
   customerGroup: CustomerGroup;
   createdAt?: string;

@@ -18,6 +18,8 @@ export async function saveCustomer(
   product: {
     code: string,
     name: string,
+    dni: string,
+    email: string,
     customerGroupId?: string
   }
 ): Promise<string> {

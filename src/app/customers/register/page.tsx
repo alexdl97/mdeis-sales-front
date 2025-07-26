@@ -24,6 +24,7 @@ export default function CustomerRegister() {
   const [customerGroupSelected, setCustomerGroupSelected] =
     useState<CustomerGroup | null>(null);
   const [messageError, setMessageError] = useState<string>("");
+  const [showFormError, setShowFormError] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   useEffect(() => {
@@ -43,27 +44,52 @@ export default function CustomerRegister() {
   const [form, setForm] = useState({
     code: "",
     name: "",
+    taxId: "",
+    email: "",
     price: "",
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
+    if (name === "taxId") {
+      if (!/^\d*$/.test(value)) return;
+    }
     setForm({
       ...form,
       [name]: value,
     });
   };
 
+  const validateForm = () => {
+    const emailRegex = /^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/;
+    const nameRegex = /^[A-Za-zÁÉÍÓÚáéíóúñÑ\s]+$/;
+    const codeRegex = /^[A-Za-z0-9-]+$/;
+    const taxIdRegex = /^\d{5,12}$/;
+
+    return (
+      emailRegex.test(form.email) &&
+      nameRegex.test(form.name) &&
+      codeRegex.test(form.code) &&
+      taxIdRegex.test(form.taxId) &&
+      customerGroupSelected
+    );
+  };
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setMessageError("");
-    if (!customerGroupSelected) {
-      setMessageError("Se debe seleccionar un grupo de cliente.");
+    setShowFormError(false);
+    if (!validateForm()) {
+      setMessageError("Debes completar el formulario.");
+      setShowFormError(true);
+      return;
     }
 
     const result = await saveCustomer({
       code: form.code,
       name: form.name,
+      dni: form.taxId,
+      email: form.email,
       customerGroupId: customerGroupSelected?.id,
     });
     console.log('result ', result);
@@ -117,7 +143,12 @@ export default function CustomerRegister() {
             name="code"
             value={form.code}
             onChange={handleChange}
-            required
+            error={(!!form.code || showFormError) && !/^[A-Za-z0-9-]+$/.test(form.code)}
+            helperText={
+              (!!form.code || showFormError) && !/^[A-Za-z0-9-]+$/.test(form.code)
+                ? "Código inválido (solo letras y números, 3-10 caracteres)"
+                : ""
+            }
           />
         </Grid>
         <Grid size={{ xs: 6, md: 4 }}>
@@ -126,7 +157,40 @@ export default function CustomerRegister() {
             name="name"
             value={form.name}
             onChange={handleChange}
-            required
+            error={(!!form.name || showFormError) && !/^[A-Za-zÁÉÍÓÚáéíóúñÑ\s]+$/.test(form.name)}
+            helperText={
+              (!!form.name || showFormError) && !/^[A-Za-zÁÉÍÓÚáéíóúñÑ\s]+$/.test(form.name)
+                ? "Nombre inválido (solo letras y espacios)"
+                : ""
+            }
+          />
+        </Grid>
+        <Grid size={{ xs: 6, md: 4 }}>
+          <TextField
+            label="Nro CI/NIT"
+            name="taxId"
+            value={form.taxId}
+            onChange={handleChange}
+            error={(!!form.taxId || showFormError) && !/^\d{5,12}$/.test(form.taxId)}
+            helperText={
+              (!!form.taxId || showFormError) && !/^\d{5,12}$/.test(form.taxId)
+                ? "Número inválido (debe tener entre 5 y 12 dígitos)"
+                : ""
+            }
+          />
+        </Grid>
+        <Grid size={{ xs: 6, md: 4 }}>
+          <TextField
+            label="Email"
+            name="email"
+            value={form.email}
+            onChange={handleChange}
+            error={(!!form.email || showFormError) && !/^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/.test(form.email)}
+            helperText={
+              (!!form.email || showFormError) && !/^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/.test(form.email)
+                ? "Correo no válido"
+                : ""
+            }
           />
         </Grid>
 
@@ -148,7 +212,6 @@ export default function CustomerRegister() {
                 name: "age",
                 id: "uncontrolled-native",
               }}
-              required
             >
               {customerGroups.map((c, i) => (
                 <MenuItem key={`customerGroup-${i}`} value={c.id}>

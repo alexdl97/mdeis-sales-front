@@ -47,6 +47,8 @@ export default function CustomersList() {
               <TableCell align="center" style={{ fontWeight: 'bold' }}>Nro</TableCell>
               <TableCell align="center" style={{ fontWeight: 'bold' }}>Código</TableCell>
               <TableCell align="center" style={{ fontWeight: 'bold' }}>Nombre</TableCell>
+              <TableCell align="center" style={{ fontWeight: 'bold' }}>CI/NIT</TableCell>
+              <TableCell align="center" style={{ fontWeight: 'bold' }}>Email</TableCell>
               <TableCell align="center" style={{ fontWeight: 'bold' }}>Grupo</TableCell>
               <TableCell align="center" style={{ fontWeight: 'bold' }}>Grupo Descuento</TableCell>
             </TableRow>
@@ -65,6 +67,12 @@ export default function CustomersList() {
                 </TableCell>
                 <TableCell align="center">
                   {row.name}
+                </TableCell>
+                <TableCell align="center">
+                  {row.dni}
+                </TableCell>
+                <TableCell align="center">
+                  {row.email}
                 </TableCell>
                 <TableCell align="center">
                   {row.customerGroup?.name}

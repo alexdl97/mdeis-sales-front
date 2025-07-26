@@ -250,6 +250,16 @@ export default function VentasPage() {
             <FormControl fullWidth>
               <TextField
                 id="outlined-basic"
+                value={customerSelected?.code ?? ''}
+                label="Codigo Cliente"
+                variant="outlined"
+              />
+            </FormControl>
+          </Grid>
+          <Grid size={{ xs: 6, md: 4 }}>
+            <FormControl fullWidth>
+              <TextField
+                id="outlined-basic"
                 value={taxId}
                 label="NIT/CI"
                 variant="outlined"
@@ -358,7 +368,7 @@ export default function VentasPage() {
         <Divider />
         <Box display="flex" justifyContent="space-between" mt={2} mx={4}>
           <h3>Total</h3>
-          <h3 style={{ color: "black", fontWeight: "normal" }}>{totalPrice}</h3>
+          <h3 style={{ color: "black", fontWeight: "normal" }}>{totalPrice.toFixed(2)}</h3>
         </Box>
         <Box
           mt={4}
