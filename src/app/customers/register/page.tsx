@@ -18,6 +18,9 @@ import { CustomerGroup } from "@/types";
 import { useRouter } from "next/navigation";
 import { getCustomersGroup, saveCustomer } from "@/app/services/customerService";
 
+const regexPassport = /^[A-Za-z0-9]{0,20}$/;
+const regexCINIT = /^[0-9]{0,20}$/;
+
 export default function CustomerRegister() {
   const router = useRouter();
   const [customerGroups, setCustomerGroup] = useState<CustomerGroup[]>([]);
@@ -26,7 +29,8 @@ export default function CustomerRegister() {
   const [messageError, setMessageError] = useState<string>("");
   const [showFormError, setShowFormError] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [typeDoc, setTypeDoc] = useState<string>('ci');
+  const [documentType, setDocumentType] = useState<string>('CI');
+  const [currentRegex, setCurrentRegex] = useState<RegExp>(regexCINIT);
 
   useEffect(() => {
     getListCustomerGroups();
@@ -52,9 +56,6 @@ export default function CustomerRegister() {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    if (name === "taxId") {
-      if (!/^\d*$/.test(value)) return;
-    }
     setForm({
       ...form,
       [name]: value,
@@ -65,7 +66,7 @@ export default function CustomerRegister() {
     const emailRegex = /^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/;
     const nameRegex = /^[A-Za-zÁÉÍÓÚáéíóúñÑ\s]+$/;
     const codeRegex = /^[A-Za-z0-9-]+$/;
-    const taxIdRegex = /^\d{5,12}$/;
+    const taxIdRegex =currentRegex;
 
     return (
       emailRegex.test(form.email) &&
@@ -91,7 +92,7 @@ export default function CustomerRegister() {
       name: form.name,
       dni: form.taxId,
       email: form.email,
-      typeDoc: typeDoc,
+      documentType: documentType,
       customerGroupId: customerGroupSelected?.id,
     });
     console.log('result ', result);
@@ -190,22 +191,27 @@ export default function CustomerRegister() {
               Tipo de Documento
             </InputLabel>
             <Select
-              value={typeDoc}
+              value={documentType}
               onChange={(e) => {
-                setTypeDoc(e.target?.value)
+                if (e.target?.value === 'PASSPORT') {
+                  setCurrentRegex(regexPassport);
+                } else {
+                  setCurrentRegex(regexCINIT);
+                }
+                setDocumentType(e.target?.value)
               }}
               inputProps={{
                 name: "age",
                 id: "uncontrolled-native",
               }}
             >
-              <MenuItem key={`1`} value={'ci'}>
+              <MenuItem key={`1`} value={'CI'}>
                 Documento Identidad
               </MenuItem>
-              <MenuItem key={`2`} value={'passport'}>
+              <MenuItem key={`2`} value={'PASSPORT'}>
                 Pasaporte
               </MenuItem>
-              <MenuItem key={`3`} value={'nit'}>
+              <MenuItem key={`3`} value={'NIT'}>
                 Nit
               </MenuItem>
             </Select>
@@ -214,13 +220,13 @@ export default function CustomerRegister() {
         <Grid size={{ xs: 6, md: 4 }}>
           <TextField
             fullWidth
-            label="Nro CI/NIT"
+            label="Nro CI/NIT/PASAPORTE"
             name="taxId"
             value={form.taxId}
             onChange={handleChange}
-            error={(!!form.taxId || showFormError) && !/^\d{5,12}$/.test(form.taxId)}
+            error={(!!form.taxId || showFormError) && !currentRegex.test(form.taxId)}
             helperText={
-              (!!form.taxId || showFormError) && !/^\d{5,12}$/.test(form.taxId)
+              (!!form.taxId || showFormError) && !currentRegex.test(form.taxId)
                 ? "Número inválido (debe tener entre 5 y 12 dígitos)"
                 : ""
             }

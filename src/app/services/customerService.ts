@@ -20,7 +20,7 @@ export async function saveCustomer(
     name: string,
     dni: string,
     email: string,
-    typeDoc: string,
+    documentType: string,
     customerGroupId?: string
   }
 ): Promise<string> {

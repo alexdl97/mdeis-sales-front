@@ -47,6 +47,7 @@ export default function CustomersList() {
               <TableCell align="center" style={{ fontWeight: 'bold' }}>Nro</TableCell>
               <TableCell align="center" style={{ fontWeight: 'bold' }}>Código</TableCell>
               <TableCell align="center" style={{ fontWeight: 'bold' }}>Nombre</TableCell>
+              <TableCell align="center" style={{ fontWeight: 'bold' }}>Tipo Documento</TableCell>
               <TableCell align="center" style={{ fontWeight: 'bold' }}>CI/NIT</TableCell>
               <TableCell align="center" style={{ fontWeight: 'bold' }}>Email</TableCell>
               <TableCell align="center" style={{ fontWeight: 'bold' }}>Grupo</TableCell>
@@ -67,6 +68,9 @@ export default function CustomersList() {
                 </TableCell>
                 <TableCell align="center">
                   {row.name}
+                </TableCell>
+                <TableCell align="center">
+                  {row.documentType}
                 </TableCell>
                 <TableCell align="center">
                   {row.dni}

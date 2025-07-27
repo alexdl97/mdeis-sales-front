@@ -12,6 +12,7 @@ export interface Customer {
   name: string;
   code: string;
   dni: string;
+  documentType: string;
   email: string;
   customerGroupId?: string;
   customerGroup: CustomerGroup;
