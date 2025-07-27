@@ -26,6 +26,7 @@ export default function CustomerRegister() {
   const [messageError, setMessageError] = useState<string>("");
   const [showFormError, setShowFormError] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [typeDoc, setTypeDoc] = useState<string>('ci');
 
   useEffect(() => {
     getListCustomerGroups();
@@ -90,6 +91,7 @@ export default function CustomerRegister() {
       name: form.name,
       dni: form.taxId,
       email: form.email,
+      typeDoc: typeDoc,
       customerGroupId: customerGroupSelected?.id,
     });
     console.log('result ', result);
@@ -139,6 +141,7 @@ export default function CustomerRegister() {
       >
         <Grid size={{ xs: 6, md: 4 }}>
           <TextField
+            fullWidth
             label="Código del cliente"
             name="code"
             value={form.code}
@@ -153,6 +156,7 @@ export default function CustomerRegister() {
         </Grid>
         <Grid size={{ xs: 6, md: 4 }}>
           <TextField
+            fullWidth
             label="Nombre del cliente"
             name="name"
             value={form.name}
@@ -167,20 +171,7 @@ export default function CustomerRegister() {
         </Grid>
         <Grid size={{ xs: 6, md: 4 }}>
           <TextField
-            label="Nro CI/NIT"
-            name="taxId"
-            value={form.taxId}
-            onChange={handleChange}
-            error={(!!form.taxId || showFormError) && !/^\d{5,12}$/.test(form.taxId)}
-            helperText={
-              (!!form.taxId || showFormError) && !/^\d{5,12}$/.test(form.taxId)
-                ? "Número inválido (debe tener entre 5 y 12 dígitos)"
-                : ""
-            }
-          />
-        </Grid>
-        <Grid size={{ xs: 6, md: 4 }}>
-          <TextField
+            fullWidth
             label="Email"
             name="email"
             value={form.email}
@@ -193,7 +184,48 @@ export default function CustomerRegister() {
             }
           />
         </Grid>
-
+        <Grid size={{ xs: 6, md: 4 }}>
+          <FormControl fullWidth>
+            <InputLabel variant="standard" htmlFor="uncontrolled-native">
+              Tipo de Documento
+            </InputLabel>
+            <Select
+              value={typeDoc}
+              onChange={(e) => {
+                setTypeDoc(e.target?.value)
+              }}
+              inputProps={{
+                name: "age",
+                id: "uncontrolled-native",
+              }}
+            >
+              <MenuItem key={`1`} value={'ci'}>
+                Documento Identidad
+              </MenuItem>
+              <MenuItem key={`2`} value={'passport'}>
+                Pasaporte
+              </MenuItem>
+              <MenuItem key={`3`} value={'nit'}>
+                Nit
+              </MenuItem>
+            </Select>
+          </FormControl>
+        </Grid>
+        <Grid size={{ xs: 6, md: 4 }}>
+          <TextField
+            fullWidth
+            label="Nro CI/NIT"
+            name="taxId"
+            value={form.taxId}
+            onChange={handleChange}
+            error={(!!form.taxId || showFormError) && !/^\d{5,12}$/.test(form.taxId)}
+            helperText={
+              (!!form.taxId || showFormError) && !/^\d{5,12}$/.test(form.taxId)
+                ? "Número inválido (debe tener entre 5 y 12 dígitos)"
+                : ""
+            }
+          />
+        </Grid>
         <Grid size={{ xs: 6, md: 4 }}>
           <FormControl fullWidth>
             <InputLabel variant="standard" htmlFor="uncontrolled-native">
