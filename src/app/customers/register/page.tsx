@@ -20,13 +20,21 @@ import { getCustomersGroup, saveCustomer } from "@/app/services/customerService"
 
 const regexPassport = /^[A-Za-z0-9]{0,20}$/;
 const regexCINIT = /^[0-9]{0,20}$/;
+type MessageType = 'error' | 'info' | 'success' | 'warning';
+interface MessageInfo {
+  type: MessageType;
+  message: string;
+}
 
 export default function CustomerRegister() {
   const router = useRouter();
   const [customerGroups, setCustomerGroup] = useState<CustomerGroup[]>([]);
   const [customerGroupSelected, setCustomerGroupSelected] =
     useState<CustomerGroup | null>(null);
-  const [messageError, setMessageError] = useState<string>("");
+  const [messageInfo, setMessageInfo] = useState<MessageInfo>({
+    type: 'info',
+    message: '',
+  });
   const [showFormError, setShowFormError] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [documentType, setDocumentType] = useState<string>('CI');
@@ -79,10 +87,16 @@ export default function CustomerRegister() {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setMessageError("");
+    setMessageInfo({
+      type: 'info',
+      message: ''
+    });
     setShowFormError(false);
     if (!validateForm()) {
-      setMessageError("Debes completar el formulario.");
+      setMessageInfo({
+        type: 'error',
+        message: 'Debes completar el formulario.'
+      });
       setShowFormError(true);
       return;
     }
@@ -97,11 +111,27 @@ export default function CustomerRegister() {
     });
     console.log('result ', result);
     if (!result) {
+      setMessageInfo({
+        type: 'success',
+        message: `Cliente ${form.name} registrado correctamente.`
+      })
+      await sleep(1);
       router.replace("/customers");
     } else {
-      setMessageError(result);
+      setMessageInfo({
+        type: 'error',
+        message: result
+      });
     }
   };
+
+  const sleep = (seconds: number) => {
+    return new Promise((resolve, _reject) => {
+      setTimeout(() => {
+        resolve(null);
+      }, seconds * 1000);
+    });
+  }
 
   if (isLoading) return <CircularProgress />;
 
@@ -118,10 +148,10 @@ export default function CustomerRegister() {
         Registrar Cliente
       </Typography>
       {
-        messageError &&
+        messageInfo.message &&
         <Box display="flex" justifyContent="center">
             <Box width="70vw">
-                <Alert severity="error">{messageError}</Alert>
+                <Alert severity={messageInfo.type}>{messageInfo.message}</Alert>
             </Box>
         </Box>
       }

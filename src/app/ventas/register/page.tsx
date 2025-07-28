@@ -30,6 +30,12 @@ import { getPaymentsConditions } from "../../services/paymentConditionService";
 import { saveSaleInvoce } from "@/app/services/saleService";
 import { useRouter } from "next/navigation";
 
+type MessageType = 'error' | 'info' | 'success' | 'warning';
+interface MessageInfo {
+  type: MessageType;
+  message: string;
+}
+
 export default function VentasPage() {
   const router = useRouter();
   const [products, setProducts] = useState<Product[]>([]);
@@ -51,7 +57,10 @@ export default function VentasPage() {
     null
   );
   const [items, setItems] = useState<SaleInvoceDetail[]>([]);
-  const [messageError, setMessageError] = useState<string>("");
+  const [messageInfo, setMessageInfo] = useState<MessageInfo>({
+    type: 'info',
+    message: '',
+  });
 
   useEffect(() => {
     const fetchData = async () => {
@@ -84,6 +93,7 @@ export default function VentasPage() {
     setCustomers(customersList);
     if (customersList.length) {
       setCustomerSelected(customersList[0]);
+      setTaxId(customersList[0]?.dni ?? '');
     }
   };
 
@@ -104,9 +114,15 @@ export default function VentasPage() {
   };
 
   const addProduct = () => {
-    setMessageError("");
+    setMessageInfo({
+      type: 'info',
+      message: ''
+    });
     if (!productSelected) {
-      setMessageError("Debe seleccionar un producto");
+      setMessageInfo({
+        type: 'error',
+        message: 'Debe seleccionar un producto'
+      });
       return;
     }
     const disc =
@@ -152,25 +168,43 @@ export default function VentasPage() {
   };
 
   const saveSale = async () => {
-    setMessageError("");
+    setMessageInfo({
+      type: 'info',
+      message: ''
+    });
     if (!customerSelected) {
-      setMessageError('Debe seleccionar un cliente');
+      setMessageInfo({
+        type: 'error',
+        message: 'Debe seleccionar un cliente'
+      });
       return;
     }
     if (!warehouseSelected) {
-      setMessageError('Debe seleccionar un almacen');
+      setMessageInfo({
+        type: 'error',
+        message: 'Debe seleccionar un almacen'
+      });
       return;
     }
     if (!paymentConditionSelected) {
-      setMessageError('Debe seleccionar una condicion de pago');
+      setMessageInfo({
+        type: 'error',
+        message: 'Debe seleccionar una condicion de pago'
+      });
       return;
     }
     if(!taxId) {
-      setMessageError('Debe ingresar el NIT/CI');
+      setMessageInfo({
+        type: 'error',
+        message: 'Debe ingresar el NIT/CI'
+      });
       return;
     }
     if (!items.length) {
-      setMessageError('Se debe agregar 1 producto mínimo');
+      setMessageInfo({
+        type: 'error',
+        message: 'Se debe agregar 1 producto mínimo'
+      });
       return;
     }
 
@@ -188,9 +222,22 @@ export default function VentasPage() {
 
     const ok = await saveSaleInvoce(body);
     if (ok) {
+      setMessageInfo({
+        type: 'success',
+        message: `Venta registrada correctamente.`
+      })
+      await sleep(1);
       router.replace('/ventas');
     }
   };
+
+  const sleep = (seconds: number) => {
+    return new Promise((resolve, _reject) => {
+      setTimeout(() => {
+        resolve(null);
+      }, seconds * 1000);
+    });
+  }
 
   const totalPrice = items.reduce(
     (acc, item) => acc + item.totalPrice,
@@ -218,7 +265,7 @@ export default function VentasPage() {
         >
           Registrar Venta
         </h1>
-        {messageError && <Alert severity="error">{messageError}</Alert>}
+        {messageInfo.message && <Alert severity={messageInfo.type}>{messageInfo.message}</Alert>}
         <Grid mt={2} container spacing={2}>
           <Grid size={{ xs: 6, md: 4 }}>
             <FormControl fullWidth>
@@ -227,11 +274,12 @@ export default function VentasPage() {
               </InputLabel>
               <Select
                 value={customerSelected?.id ?? 0}
-                onChange={(e) =>
-                  setCustomerSelected(
-                    customers.find((c) => c.id === e.target.value.toString()) ||
-                      customers[0]
-                  )
+                onChange={(e) => {
+                  const customerFound = customers.find((c) => c.id === e.target.value.toString()) ||
+                      customers[0];
+                  setCustomerSelected(customerFound)
+                  setTaxId(customerFound?.dni ?? '');
+                }
                 }
                 inputProps={{
                   name: "age",
